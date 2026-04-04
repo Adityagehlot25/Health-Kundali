@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+.pnp
+.pnp.js
+
+# Expo / React Native
+.expo/
+dist/
+web-build/
+
+# Android Build Caches (We KEEP the android folder, but ignore the massive cache files inside it)
+android/.gradle/
+android/build/
+android/app/build/
+android/app/.cxx/
+*.apk
+*.aab
+*.jks
+
+# iOS
+ios/Pods/
+ios/build/
+ios/Index/
+ios/*.xcworkspace/xcuserdata
+
+# Misc
+.DS_Store
+.env
+.env.local
