@@ -1,0 +1,299 @@
+{
+  "users": [
+    {
+      "id": "046eabed-1aeb-4df1-8a67-fcfccb1201f3",
+      "email": "copilot.test.1775298712@example.com",
+      "name": "Copilot Test",
+      "passwordHash": "$2a$10$/vuum1a/JVUEcIbXspFdnesMBDlnXQVu8pNi0/0t.RsotcE2LtS06",
+      "createdAt": "2026-04-04T10:31:53.781Z"
+    },
+    {
+      "id": "89289671-f318-4654-96c1-a720a471a34f",
+      "email": "copilot.test.1775298741471@example.com",
+      "name": "Copilot Test",
+      "passwordHash": "$2a$10$T5EUOwKMamlRgwxwaxiINuKYvKlSmd.1JefIowmq6pLpo22tEFq7.",
+      "createdAt": "2026-04-04T10:32:21.697Z"
+    },
+    {
+      "id": "2e76a6b4-afb0-46a3-a44b-141f007557ae",
+      "email": "quick.one.1775300514629@example.com",
+      "name": "Quick One",
+      "passwordHash": "$2a$10$z/gWSw4nabJssJ6eMqVtnecBoascog19PkNIh/yurTgxR1ziFnF/q",
+      "createdAt": "2026-04-04T11:01:55.120Z"
+    },
+    {
+      "id": "9acdfeec-c5b5-44c6-98d9-10101896346e",
+      "email": "quick.two.1775300514629@example.com",
+      "name": "Quick Two",
+      "passwordHash": "$2a$10$E/hz/QAODIlWX8EpS0EQY.vaeQuO2.78PxhcLior6VZ93r/wfFc3O",
+      "createdAt": "2026-04-04T11:01:55.387Z"
+    },
+    {
+      "id": "adc6d21d-20d1-4d78-bbeb-8190f37586f3",
+      "email": "shivgupta45750@gmail.com",
+      "name": "Shiv gupta",
+      "passwordHash": "$2a$10$b.mHwlFG//6vFsGHwDxxb.CfQVME198Qf0v8LxPuItAz4GgSLqiiK",
+      "createdAt": "2026-04-04T11:11:48.110Z"
+    },
+    {
+      "id": "911b048e-984b-4778-a87f-14263b68eb77",
+      "email": "anuragrai123@gmail.com",
+      "name": "Anurag rai",
+      "passwordHash": "$2a$10$fheDlH22hvLcnYaJCqh8IO05j7v.Hv6Ds14saS2F4qIcxR6lkAKKe",
+      "createdAt": "2026-04-04T11:20:01.156Z"
+    },
+    {
+      "id": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "email": "adii3434@gmail.com",
+      "name": "Aditya",
+      "passwordHash": "$2a$10$IgPBTMGfzbjYbWkmzP663e5t96lHq4QAB2EroUtaTDi4iMxsKozCG",
+      "createdAt": "2026-04-04T13:03:49.733Z"
+    }
+  ],
+  "profiles": [
+    {
+      "userId": "2e76a6b4-afb0-46a3-a44b-141f007557ae",
+      "fullName": "Quick One",
+      "age": "30",
+      "gender": "Female",
+      "weight": "60",
+      "height": "165",
+      "goal": "Run 5K",
+      "updatedAt": "2026-04-04T11:01:55.197Z",
+      "createdAt": "2026-04-04T11:01:55.197Z"
+    },
+    {
+      "userId": "9acdfeec-c5b5-44c6-98d9-10101896346e",
+      "fullName": "Quick Two",
+      "age": "28",
+      "gender": "Male",
+      "weight": "72",
+      "height": "178",
+      "goal": "Lose weight",
+      "updatedAt": "2026-04-04T11:01:55.582Z",
+      "createdAt": "2026-04-04T11:01:55.582Z"
+    },
+    {
+      "userId": "adc6d21d-20d1-4d78-bbeb-8190f37586f3",
+      "fullName": "Shiv Gupta",
+      "age": "21",
+      "gender": "Male",
+      "weight": "75",
+      "height": "175",
+      "goal": "Loose weight",
+      "updatedAt": "2026-04-04T11:12:50.427Z",
+      "createdAt": "2026-04-04T11:12:50.427Z"
+    },
+    {
+      "userId": "911b048e-984b-4778-a87f-14263b68eb77",
+      "fullName": "Anurag Rai",
+      "age": "22",
+      "gender": "Male",
+      "weight": "65",
+      "height": "175",
+      "goal": "running",
+      "updatedAt": "2026-04-04T11:20:34.307Z",
+      "createdAt": "2026-04-04T11:20:34.307Z"
+    },
+    {
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "fullName": "Aditya",
+      "age": "21",
+      "gender": "Male",
+      "weight": "63",
+      "height": "165",
+      "goal": "Improve stamina",
+      "updatedAt": "2026-04-04T13:04:26.999Z",
+      "createdAt": "2026-04-04T13:04:26.999Z"
+    }
+  ],
+  "runs": [
+    {
+      "id": "c4810c59-3c63-4d52-af9f-89b6555d42f4",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0,
+      "durationSeconds": 7,
+      "startedAt": "2026-04-04T13:22:53.695Z",
+      "endedAt": "2026-04-04T13:23:01.449Z",
+      "averagePaceSecondsPerKm": null,
+      "notes": "",
+      "createdAt": "2026-04-04T13:23:00.633Z"
+    },
+    {
+      "id": "2784ac61-3faa-4653-b347-593f111222b5",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.024,
+      "durationSeconds": 197,
+      "startedAt": "2026-04-04T13:23:19.294Z",
+      "endedAt": "2026-04-04T13:26:37.200Z",
+      "averagePaceSecondsPerKm": 8208,
+      "notes": "",
+      "createdAt": "2026-04-04T13:26:36.360Z"
+    },
+    {
+      "id": "209cac01-15ee-4cff-9047-88cb4fc6dd4e",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.014,
+      "durationSeconds": 31,
+      "startedAt": "2026-04-04T13:29:53.569Z",
+      "endedAt": "2026-04-04T13:30:25.543Z",
+      "averagePaceSecondsPerKm": 2214,
+      "notes": "",
+      "createdAt": "2026-04-04T13:30:24.765Z"
+    },
+    {
+      "id": "43075057-78cc-4114-8339-fb25d58a2aa1",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.02,
+      "durationSeconds": 41,
+      "startedAt": "2026-04-04T13:42:32.058Z",
+      "endedAt": "2026-04-04T13:43:13.663Z",
+      "averagePaceSecondsPerKm": 2050,
+      "notes": "",
+      "createdAt": "2026-04-04T13:43:13.185Z"
+    },
+    {
+      "id": "fbd8d4f9-3754-4075-a9a5-cf9f607d4ec4",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0,
+      "durationSeconds": 18,
+      "startedAt": "2026-04-04T13:50:22.470Z",
+      "endedAt": "2026-04-04T13:50:41.075Z",
+      "averagePaceSecondsPerKm": null,
+      "notes": "",
+      "createdAt": "2026-04-04T13:50:40.227Z"
+    },
+    {
+      "id": "9848e163-69be-4be9-ae90-044fec38f92c",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.008,
+      "durationSeconds": 30,
+      "startedAt": "2026-04-04T13:52:27.647Z",
+      "endedAt": "2026-04-04T13:52:57.730Z",
+      "averagePaceSecondsPerKm": 3750,
+      "notes": "",
+      "createdAt": "2026-04-04T13:52:56.874Z"
+    },
+    {
+      "id": "9fa71c3a-0d76-4ad9-a5a2-9edc2d806c30",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.021,
+      "durationSeconds": 87,
+      "startedAt": "2026-04-04T13:56:40.005Z",
+      "endedAt": "2026-04-04T13:58:07.731Z",
+      "averagePaceSecondsPerKm": 4143,
+      "notes": "",
+      "createdAt": "2026-04-04T13:58:07.174Z"
+    },
+    {
+      "id": "9a402c19-ad80-4879-8627-e8f9ef4a152b",
+      "userId": "adc6d21d-20d1-4d78-bbeb-8190f37586f3",
+      "distanceKm": 0.031,
+      "durationSeconds": 59,
+      "startedAt": "2026-04-04T14:51:52.476Z",
+      "endedAt": "2026-04-04T14:52:52.145Z",
+      "averagePaceSecondsPerKm": 1903,
+      "notes": "",
+      "createdAt": "2026-04-04T14:53:00.341Z"
+    },
+    {
+      "id": "b0305f53-55a6-4010-babd-4e9d37a3458b",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0,
+      "durationSeconds": 48,
+      "startedAt": "2026-04-04T14:54:56.141Z",
+      "endedAt": "2026-04-04T14:55:44.930Z",
+      "averagePaceSecondsPerKm": null,
+      "notes": "",
+      "createdAt": "2026-04-04T14:55:43.624Z"
+    },
+    {
+      "id": "6f90edd6-f095-41bd-92a6-d2b18d022ca7",
+      "userId": "adc6d21d-20d1-4d78-bbeb-8190f37586f3",
+      "distanceKm": 0.019,
+      "durationSeconds": 48,
+      "startedAt": "2026-04-04T14:56:02.612Z",
+      "endedAt": "2026-04-04T14:56:51.247Z",
+      "averagePaceSecondsPerKm": 2526,
+      "notes": "",
+      "createdAt": "2026-04-04T14:56:50.951Z"
+    },
+    {
+      "id": "88847900-81bb-4140-b854-a9ad65a852c7",
+      "userId": "adc6d21d-20d1-4d78-bbeb-8190f37586f3",
+      "distanceKm": 0,
+      "durationSeconds": 10,
+      "startedAt": "2026-04-04T15:01:00.166Z",
+      "endedAt": "2026-04-04T15:01:10.458Z",
+      "averagePaceSecondsPerKm": null,
+      "notes": "",
+      "createdAt": "2026-04-04T15:01:10.302Z"
+    },
+    {
+      "id": "dede23b5-0dc4-47cd-b4ba-4bf7448475d8",
+      "userId": "adc6d21d-20d1-4d78-bbeb-8190f37586f3",
+      "distanceKm": 0.038,
+      "durationSeconds": 71,
+      "startedAt": "2026-04-04T15:02:05.194Z",
+      "endedAt": "2026-04-04T15:03:16.506Z",
+      "averagePaceSecondsPerKm": 1868,
+      "notes": "",
+      "createdAt": "2026-04-04T15:03:16.261Z"
+    },
+    {
+      "id": "b3ecc7ad-5beb-44e0-ae86-179521a7e4d8",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.034,
+      "durationSeconds": 57,
+      "startedAt": "2026-04-04T15:06:14.536Z",
+      "endedAt": "2026-04-04T15:07:12.460Z",
+      "averagePaceSecondsPerKm": 1676,
+      "notes": "",
+      "createdAt": "2026-04-04T15:07:11.096Z"
+    },
+    {
+      "id": "1716ec9e-2e2e-40d9-bfc0-69f85e536ed1",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0,
+      "durationSeconds": 5,
+      "startedAt": "2026-04-04T15:14:33.231Z",
+      "endedAt": "2026-04-04T15:14:38.698Z",
+      "averagePaceSecondsPerKm": null,
+      "notes": "",
+      "createdAt": "2026-04-04T15:14:38.610Z"
+    },
+    {
+      "id": "d66f42c3-6526-4fac-be53-2dc17ab5c25b",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0,
+      "durationSeconds": 0,
+      "startedAt": "2026-04-04T15:18:00.500Z",
+      "endedAt": "2026-04-04T15:18:01.291Z",
+      "averagePaceSecondsPerKm": null,
+      "notes": "",
+      "createdAt": "2026-04-04T15:18:01.309Z"
+    },
+    {
+      "id": "0af61e6e-fe63-484c-9d4d-c1c24c46fe28",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.007,
+      "durationSeconds": 33,
+      "startedAt": "2026-04-04T15:18:04.626Z",
+      "endedAt": "2026-04-04T15:18:38.368Z",
+      "averagePaceSecondsPerKm": 4714,
+      "notes": "",
+      "createdAt": "2026-04-04T15:18:38.509Z"
+    },
+    {
+      "id": "f96947aa-c8de-4961-9506-6c65aee3c6e6",
+      "userId": "a62dffeb-fdd4-4461-8eb7-f1c4edbf66f5",
+      "distanceKm": 0.003,
+      "durationSeconds": 58,
+      "startedAt": "2026-04-04T15:21:41.215Z",
+      "endedAt": "2026-04-04T15:22:39.725Z",
+      "averagePaceSecondsPerKm": 19333,
+      "notes": "",
+      "createdAt": "2026-04-04T15:22:39.671Z"
+    }
+  ]
+}
