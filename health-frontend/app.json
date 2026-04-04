@@ -32,7 +32,22 @@
     },
     "plugins": [
       "expo-router",
-      "expo-health-connect",
+      [
+        "react-native-health-connect",
+        {
+          "requestPermissions": [
+            "READ_STEPS",
+            "READ_ACTIVE_CALORIES_BURNED",
+            "READ_TOTAL_CALORIES_BURNED",
+            "READ_DISTANCE",
+            "READ_SLEEP_SESSION",
+            "READ_HEART_RATE",
+            "READ_BLOOD_PRESSURE",
+            "READ_OXYGEN_SATURATION",
+            "READ_BODY_TEMPERATURE"
+          ]
+        }
+      ],
       [
         "expo-splash-screen",
         {
