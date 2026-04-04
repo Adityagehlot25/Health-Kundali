@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, ScrollView, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 
 // NEW: Import our custom Master Service instead of raw Health Connect functions
 import { fetchMasterBiologicalData } from '../../services/HealthConnectService';
@@ -206,72 +207,150 @@ export default function App() {
     }
   };
 
+
+  // return (
+  //   <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+  //     <Text style={styles.title}>HealthKundli AI</Text>
+  //     <Text style={styles.subtitle}>Enter today's stats for tomorrow's plan.</Text>
+
+  //     <TouchableOpacity style={styles.sensorButton} onPress={pullHealthData} disabled={loading}>
+  //       <Text style={styles.sensorButtonText}>📱 Auto-Pull Health Data</Text>
+  //     </TouchableOpacity>
+
+  //     {/* --- PIPELINE 2: SMART LOGGER --- */}
+  //     <View style={styles.logContainer}>
+  //       <Text style={styles.logLabel}>Smart Journal (Food, Workouts, Injuries):</Text>
+  //       <TextInput
+  //         style={styles.logInput}
+  //         placeholder="Log as you go! e.g., 'Just had a bowl of Kellogg's with 200ml milk', 'Ran 5k', or 'My knee hurts.'"
+  //         multiline={true}
+  //         value={smartLogText}
+  //         onChangeText={setSmartLogText}
+  //       />
+  //       <TouchableOpacity style={styles.parseButton} onPress={parseSmartLog} disabled={isParsing}>
+  //         {isParsing ? <ActivityIndicator color="#fff" /> : <Text style={styles.parseButtonText}>✨ Extract Data</Text>}
+  //       </TouchableOpacity>
+  //     </View>
+
+  //     {/* --- LIVE AI MEMORY PREVIEW --- */}
+  //     <View style={styles.memoryCard}>
+  //       <Text style={styles.memoryTitle}>🧠 AI Memory (Live):</Text>
+  //       <Text style={styles.memoryText}>🔥 Calories: {manualData.nutrition.calories} kcal</Text>
+  //       <Text style={styles.memoryText}>💧 Water: {manualData.nutrition.waterLiters} L</Text>
+  //       <Text style={styles.memoryText}>🍎 Food Log: {manualData?.nutrition?.foodItems?.join(", ") || "None"}</Text>
+  //       <Text style={styles.memoryText}>
+  //         💪 Gym: {manualData?.gym?.split !== "None" ? manualData?.gym?.split : "Rest"}
+  //         {manualData?.gym?.workoutLogs?.length > 0 ?
+  //           ` (${manualData.gym.workoutLogs.map((log: any) =>
+  //             typeof log === 'object' ? JSON.stringify(log) : log
+  //           ).join(", ")})`
+  //           : ""
+  //         }
+  //       </Text>
+  //       <Text style={styles.memoryText}>🩹 Injuries: {manualData?.injuries?.location || "None"}</Text>
+  //     </View>
+
+  //     <View style={styles.inputContainer}>
+  //       <TextInput style={styles.input} placeholder="Steps" keyboardType="numeric" value={steps} onChangeText={setSteps} />
+  //       <TextInput style={styles.input} placeholder="Sleep" keyboardType="numeric" value={sleep} onChangeText={setSleep} />
+  //       <TextInput style={styles.input} placeholder="HR" keyboardType="numeric" value={hr} onChangeText={setHr} />
+  //     </View>
+
+  //     <ScrollView style={styles.cardContainer}>
+  //       {plan ? (
+  //         <View style={styles.planCard}>
+  //           <Text style={styles.planText}>{plan}</Text>
+  //         </View>
+  //       ) : (
+  //         <Text style={styles.placeholderText}>Awaiting health data sync...</Text>
+  //       )}
+  //     </ScrollView>
+
+  //     <TouchableOpacity style={styles.button} onPress={generatePlan} disabled={loading}>
+  //       {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Generate AI Plan</Text>}
+  //     </TouchableOpacity>
+  //   </KeyboardAvoidingView>
+  // );
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-      <Text style={styles.title}>HealthKundli AI</Text>
-      <Text style={styles.subtitle}>Enter today's stats for tomorrow's plan.</Text>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: '#f4f4f9' }}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
 
-      <TouchableOpacity style={styles.sensorButton} onPress={pullHealthData} disabled={loading}>
-        <Text style={styles.sensorButtonText}>📱 Auto-Pull Health Data</Text>
-      </TouchableOpacity>
+        <Text style={styles.title}>HealthKundli AI</Text>
+        <Text style={styles.subtitle}>Enter today's stats for tomorrow's plan.</Text>
 
-      {/* --- PIPELINE 2: SMART LOGGER --- */}
-      <View style={styles.logContainer}>
-        <Text style={styles.logLabel}>Smart Journal (Food, Workouts, Injuries):</Text>
-        <TextInput
-          style={styles.logInput}
-          placeholder="Log as you go! e.g., 'Just had a bowl of Kellogg's with 200ml milk', 'Ran 5k', or 'My knee hurts.'"
-          multiline={true}
-          value={smartLogText}
-          onChangeText={setSmartLogText}
-        />
-        <TouchableOpacity style={styles.parseButton} onPress={parseSmartLog} disabled={isParsing}>
-          {isParsing ? <ActivityIndicator color="#fff" /> : <Text style={styles.parseButtonText}>✨ Extract Data</Text>}
+        <TouchableOpacity style={styles.sensorButton} onPress={pullHealthData} disabled={loading}>
+          <Text style={styles.sensorButtonText}>📱 Auto-Pull Health Data</Text>
         </TouchableOpacity>
-      </View>
 
-      {/* --- LIVE AI MEMORY PREVIEW --- */}
-      <View style={styles.memoryCard}>
-        <Text style={styles.memoryTitle}>🧠 AI Memory (Live):</Text>
-        <Text style={styles.memoryText}>🔥 Calories: {manualData.nutrition.calories} kcal</Text>
-        <Text style={styles.memoryText}>💧 Water: {manualData.nutrition.waterLiters} L</Text>
-        <Text style={styles.memoryText}>🍎 Food Log: {manualData?.nutrition?.foodItems?.join(", ") || "None"}</Text>
-        <Text style={styles.memoryText}>
-          💪 Gym: {manualData?.gym?.split !== "None" ? manualData?.gym?.split : "Rest"}
-          {manualData?.gym?.workoutLogs?.length > 0 ?
-            ` (${manualData.gym.workoutLogs.map((log: any) =>
-              typeof log === 'object' ? JSON.stringify(log) : log
-            ).join(", ")})`
-            : ""
-          }
-        </Text>
-        <Text style={styles.memoryText}>🩹 Injuries: {manualData?.injuries?.location || "None"}</Text>
-      </View>
+        {/* --- PIPELINE 2: SMART LOGGER --- */}
+        <View style={styles.logContainer}>
+          <Text style={styles.logLabel}>Smart Journal (Food, Workouts, Injuries):</Text>
+          <TextInput
+            style={styles.logInput}
+            placeholder="Log as you go! e.g., 'Just had a bowl of Kellogg's...'"
+            multiline={true}
+            value={smartLogText}
+            onChangeText={setSmartLogText}
+          />
+          <TouchableOpacity style={styles.parseButton} onPress={parseSmartLog} disabled={isParsing}>
+            {isParsing ? <ActivityIndicator color="#fff" /> : <Text style={styles.parseButtonText}>✨ Extract Data</Text>}
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="Steps" keyboardType="numeric" value={steps} onChangeText={setSteps} />
-        <TextInput style={styles.input} placeholder="Sleep" keyboardType="numeric" value={sleep} onChangeText={setSleep} />
-        <TextInput style={styles.input} placeholder="HR" keyboardType="numeric" value={hr} onChangeText={setHr} />
-      </View>
+        {/* --- LIVE AI MEMORY PREVIEW --- */}
+        <View style={styles.memoryCard}>
+          <Text style={styles.memoryTitle}>🧠 AI Memory (Live):</Text>
+          <Text style={styles.memoryText}>🔥 Calories: {manualData.nutrition.calories} kcal</Text>
+          <Text style={styles.memoryText}>💧 Water: {manualData.nutrition.waterLiters} L</Text>
+          <Text style={styles.memoryText}>🍎 Food Log: {manualData?.nutrition?.foodItems?.join(", ") || "None"}</Text>
+          <Text style={styles.memoryText}>
+            💪 Gym: {manualData?.gym?.split !== "None" ? manualData?.gym?.split : "Rest"}
+            {manualData?.gym?.workoutLogs?.length > 0 ?
+              ` (${manualData.gym.workoutLogs.map((log: any) =>
+                typeof log === 'object' ? JSON.stringify(log) : log
+              ).join(", ")})`
+              : ""
+            }
+          </Text>
+          <Text style={styles.memoryText}>🩹 Injuries: {manualData?.injuries?.location || "None"}</Text>
+        </View>
 
-      <ScrollView style={styles.cardContainer}>
+        <View style={styles.inputContainer}>
+          <TextInput style={styles.input} placeholder="Steps" keyboardType="numeric" value={steps} onChangeText={setSteps} />
+          <TextInput style={styles.input} placeholder="Sleep" keyboardType="numeric" value={sleep} onChangeText={setSleep} />
+          <TextInput style={styles.input} placeholder="HR" keyboardType="numeric" value={hr} onChangeText={setHr} />
+        </View>
+
+        {/* --- THE GENERATE BUTTON MOVES HERE --- */}
+        <TouchableOpacity style={styles.button} onPress={generatePlan} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Generate AI Plan</Text>}
+        </TouchableOpacity>
+
+        {/* --- THE BEAUTIFUL MARKDOWN PLAN --- */}
         {plan ? (
           <View style={styles.planCard}>
-            <Text style={styles.planText}>{plan}</Text>
+            <Text style={styles.planHeader}>✨ Your Daily Kundli Plan</Text>
+            <Markdown style={markdownStyles}>
+              {plan}
+            </Markdown>
           </View>
         ) : (
           <Text style={styles.placeholderText}>Awaiting health data sync...</Text>
         )}
-      </ScrollView>
 
-      <TouchableOpacity style={styles.button} onPress={generatePlan} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Generate AI Plan</Text>}
-      </TouchableOpacity>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
+
+
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 16,
+    paddingBottom: 60, // Gives room at the bottom so nothing gets cut off
+  },
   container: { flex: 1, backgroundColor: '#f4f4f9', alignItems: 'center', paddingTop: 60, paddingHorizontal: 20 },
   title: { fontSize: 32, fontWeight: 'bold', color: '#333' },
   subtitle: { fontSize: 16, color: '#666', marginBottom: 20 },
@@ -280,7 +359,24 @@ const styles = StyleSheet.create({
   inputContainer: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
   input: { flex: 1, backgroundColor: '#fff', padding: 15, borderRadius: 10, marginHorizontal: 5, textAlign: 'center', fontSize: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5, elevation: 2 },
   cardContainer: { width: '100%', flex: 1 },
-  planCard: { backgroundColor: '#fff', padding: 20, borderRadius: 15, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
+  planCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  planHeader: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#2d3436',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
   planText: { fontSize: 18, color: '#333', lineHeight: 28 },
   placeholderText: { textAlign: 'center', color: '#999', marginTop: 50, fontSize: 16 },
   button: { width: '100%', backgroundColor: '#007AFF', padding: 18, borderRadius: 12, alignItems: 'center', marginBottom: 40, marginTop: 10 },
@@ -295,4 +391,28 @@ const styles = StyleSheet.create({
   memoryCard: { width: '100%', backgroundColor: '#E8F8F5', padding: 15, borderRadius: 10, marginBottom: 15, borderWidth: 1, borderColor: '#A3E4D7' },
   memoryTitle: { fontSize: 16, fontWeight: 'bold', color: '#117A65', marginBottom: 10 },
   memoryText: { fontSize: 14, color: '#0B5345', marginBottom: 4 },
+});
+
+// Put this right at the bottom of the file!
+const markdownStyles = StyleSheet.create({
+  body: {
+    fontSize: 16,
+    lineHeight: 26,
+    color: '#333333',
+  },
+  heading2: {
+    fontSize: 20,
+    fontWeight: 'bold', // Now TypeScript knows this is safely a valid font weight
+    color: '#0984e3',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  bullet_list: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  strong: {
+    fontWeight: 'bold',
+    color: '#2d3436',
+  }
 });

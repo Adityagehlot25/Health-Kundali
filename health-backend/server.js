@@ -16,15 +16,20 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// 2. Define the Database Schema
+// 2. Define the Database Schema (The Master Kundli Schema)
 const healthSchema = new mongoose.Schema({
   userId: { type: String, required: true, default: "hackathon_user_1" },
-  steps: Number,
-  sleepHours: Number,
-  heartRate: Number,
-  currentPlan: String,
+  date: { type: Date, required: true }, // Crucial for historical tracking
+  hardwareData: { type: mongoose.Schema.Types.Mixed, default: {} }, // Catches all 9 planets (steps, SpO2, temp, etc.)
+  manualInputs: { type: mongoose.Schema.Types.Mixed, default: {} }, // Catches Smart Journal (macros, gym splits)
+  currentPlan: String, // The generated Markdown plan
   lastUpdated: { type: Date, default: Date.now }
 });
+
+// Compound index to ensure we only have ONE master record per user, per day
+healthSchema.index({ userId: 1, date: 1 }, { unique: true });
+
+
 const HealthData = mongoose.model('HealthData', healthSchema);
 
 // 3. Initialize Gemini AI
@@ -32,54 +37,130 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // 4. The Main API Endpoint
 // 4. The Main API Endpoint (The "Health Kundli" Brain)
+// app.post('/api/generate-plan', async (req, res) => {
+//   try {
+//     // We catch the massive payload from the frontend
+//     const { manualInputs, hardwareData } = req.body;
+
+//     // A. Ask the AI for a plan using the ENTIRE context
+//     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+//     const prompt = `
+//       You are an elite, highly empathetic AI Health Coach. 
+//       You are receiving the user's "Biological Kundli" (a complete snapshot of their daily health data, including native phone sensors and their manual journal logs).
+
+//       Here is the raw JSON data for today:
+//       Hardware Sensors: ${JSON.stringify(hardwareData)}
+//       Manual Journal: ${JSON.stringify(manualInputs)}
+
+//       Analyze this data deeply. Look at their steps, their macro-nutrients, their gym splits, and any injuries.
+
+//       Generate a personalized, highly actionable health plan for TOMORROW. 
+//       Format your response beautifully using Markdown (use ## headings, **bold text**, bullet points, and emojis).
+
+//       Structure your response exactly like this:
+//       ## 🧬 Daily Kundli Analysis
+//       (1 brief paragraph analyzing what they did well today and what was missing based on the exact data provided)
+
+//       ## 🎯 Tomorrow's Action Plan
+//       * **Morning:** (Specific action)
+//       * **Afternoon:** (Specific action)
+//       * **Evening:** (Specific action)
+
+//       Keep the tone encouraging, scientific, and direct. Do not invent data that isn't in the JSON.
+//     `;
+
+//     const result = await model.generateContent(prompt);
+//     const aiPlan = result.response.text();
+
+//     // B. Save to MongoDB (We'll update this schema later, just saving the plan for now)
+//     const newRecord = new HealthData({
+//       currentPlan: aiPlan
+//     });
+//     await newRecord.save();
+
+//     // C. Send the plan back to the Expo app
+//     res.json({ success: true, plan: aiPlan });
+
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, error: "Failed to generate plan" });
+//   }
+// });
+
+// 4. The Main API Endpoint (The "Health Kundli" Brain)
 app.post('/api/generate-plan', async (req, res) => {
   try {
-    // We catch the massive payload from the frontend
-    const { manualInputs, hardwareData } = req.body;
+    const { userId = "hackathon_user_1", manualInputs, hardwareData } = req.body;
 
-    // A. Ask the AI for a plan using the ENTIRE context
+    // --- A. DATABASE WIRING: Find or Create Today's Record ---
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
+
+    // Save today's data instantly (upsert = create if it doesn't exist)
+    await HealthData.findOneAndUpdate(
+      { userId: userId, date: today },
+      {
+        hardwareData: hardwareData,
+        manualInputs: manualInputs,
+        lastUpdated: Date.now()
+      },
+      { upsert: true, returnDocument: 'after' }
+    );
+
+    // --- B. TIME TRAVEL: Fetch the last 7 days of history ---
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const historicalData = await HealthData.find({
+      userId: userId,
+      date: { $gte: sevenDaysAgo, $lt: today }
+    }).sort({ date: 1 }); // Oldest to newest
+
+    // --- C. THE GOD PROMPT: Feed History + Today to Gemini ---
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    
+
     const prompt = `
       You are an elite, highly empathetic AI Health Coach. 
-      You are receiving the user's "Biological Kundli" (a complete snapshot of their daily health data, including native phone sensors and their manual journal logs).
+      You are receiving the user's "Biological Kundli" (a complete holistic snapshot).
 
-      Here is the raw JSON data for today:
-      Hardware Sensors: ${JSON.stringify(hardwareData)}
-      Manual Journal: ${JSON.stringify(manualInputs)}
+      HISTORY (Past 7 Days):
+      ${JSON.stringify(historicalData.map(d => ({ date: d.date, hardware: d.hardwareData, manual: d.manualInputs })))}
 
-      Analyze this data deeply. Look at their steps, their macro-nutrients, their gym splits, and any injuries.
+      TODAY'S EXACT DATA:
+      Hardware Sensors (Steps, SpO2, Temp, etc): ${JSON.stringify(hardwareData)}
+      Manual Journal (Macros, Gym, Injuries): ${JSON.stringify(manualInputs)}
+
+      Analyze this deeply. Look for trends (e.g., "You ran hard yesterday, and your SpO2 dipped last night").
       
       Generate a personalized, highly actionable health plan for TOMORROW. 
       Format your response beautifully using Markdown (use ## headings, **bold text**, bullet points, and emojis).
       
       Structure your response exactly like this:
-      ## 🧬 Daily Kundli Analysis
-      (1 brief paragraph analyzing what they did well today and what was missing based on the exact data provided)
+      ## 🧬 Biological Kundli Analysis
+      (1 brief, deep paragraph analyzing today's data against their historical trend. Be specific about numbers.)
       
       ## 🎯 Tomorrow's Action Plan
       * **Morning:** (Specific action)
       * **Afternoon:** (Specific action)
       * **Evening:** (Specific action)
-      
-      Keep the tone encouraging, scientific, and direct. Do not invent data that isn't in the JSON.
     `;
 
     const result = await model.generateContent(prompt);
     const aiPlan = result.response.text();
 
-    // B. Save to MongoDB (We'll update this schema later, just saving the plan for now)
-    const newRecord = new HealthData({
-      currentPlan: aiPlan
-    });
-    await newRecord.save();
+    // --- D. SAVE THE PLAN TO MONGODB ---
+    await HealthData.findOneAndUpdate(
+      { userId: userId, date: today },
+      { currentPlan: aiPlan }
+    );
 
-    // C. Send the plan back to the Expo app
+    // --- E. SEND TO FRONTEND ---
     res.json({ success: true, plan: aiPlan });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: "Failed to generate plan" });
+    console.error("Kundli Generation Error:", error);
+    res.status(500).json({ success: false, error: "Failed to generate master plan" });
   }
 });
 
