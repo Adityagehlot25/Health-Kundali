@@ -5,6 +5,8 @@ import {
   StyleSheet,
   Pressable,
   Platform,
+  Alert,
+  ScrollView,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
@@ -18,11 +20,23 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useColors } from "@/hooks/useColors";
+import {
+  startTracking,
+  pauseTracking,
+  resumeTracking,
+  stopTracking,
+  getStats,
+  getTrackingLog,
+  isTracking,
+  hasPausedRun,
+} from "@/services/runTracker";
+import { useHealth } from "@/context/HealthContext";
 
 type RunState = "idle" | "running" | "paused";
 
 export default function RunScreen() {
   const colors = useColors();
+  const { healthData, updateHealthData } = useHealth();
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const botPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -30,11 +44,35 @@ export default function RunScreen() {
   const [runState, setRunState] = useState<RunState>("idle");
   const [seconds, setSeconds] = useState(0);
   const [distance, setDistance] = useState(0);
-  const [calories, setCalories] = useState(0);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const pulseScale = useSharedValue(1);
   const btnScale = useSharedValue(1);
+
+  const syncFromTracker = () => {
+    const stats = getStats();
+    setSeconds(stats.durationSeconds);
+    setDistance(stats.distanceKm);
+    setLogs(getTrackingLog());
+
+    if (stats.isRunning) {
+      setRunState("running");
+      return;
+    }
+
+    if (hasPausedRun()) {
+      setRunState("paused");
+      return;
+    }
+
+    setRunState("idle");
+  };
+
+  useEffect(() => {
+    syncFromTracker();
+  }, []);
 
   useEffect(() => {
     if (runState === "running") {
@@ -47,9 +85,7 @@ export default function RunScreen() {
         false
       );
       intervalRef.current = setInterval(() => {
-        setSeconds((s) => s + 1);
-        setDistance((d) => +(d + 0.00027).toFixed(3));
-        setCalories((c) => +(c + 0.0083).toFixed(1));
+        syncFromTracker();
       }, 1000);
     } else {
       pulseScale.value = withTiming(1, { duration: 300 });
@@ -70,29 +106,53 @@ export default function RunScreen() {
   }));
 
   const handleStart = async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    btnScale.value = withSpring(0.95, { damping: 10 }, () => {
-      btnScale.value = withSpring(1);
-    });
-    setRunState("running");
+    try {
+      setErrorMessage(null);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      btnScale.value = withSpring(0.95, { damping: 10 }, () => {
+        btnScale.value = withSpring(1);
+      });
+      await startTracking();
+      syncFromTracker();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to start run tracking.";
+      setErrorMessage(message);
+      Alert.alert("Run Tracking", message);
+    }
   };
 
   const handlePause = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setRunState("paused");
+    pauseTracking();
+    syncFromTracker();
   };
 
   const handleResume = async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setRunState("running");
+    try {
+      setErrorMessage(null);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      await resumeTracking();
+      syncFromTracker();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to resume run tracking.";
+      setErrorMessage(message);
+      Alert.alert("Run Tracking", message);
+    }
   };
 
   const handleStop = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setRunState("idle");
-    setSeconds(0);
-    setDistance(0);
-    setCalories(0);
+    const summary = stopTracking();
+
+    if (summary) {
+      const caloriesBurned = Math.round(summary.distanceKm * 62);
+      updateHealthData({
+        distance: Number((healthData.distance + summary.distanceKm).toFixed(2)),
+        calories: healthData.calories + caloriesBurned,
+      });
+    }
+
+    syncFromTracker();
   };
 
   const formatTime = (s: number) => {
@@ -103,10 +163,8 @@ export default function RunScreen() {
     return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   };
 
-  const pace =
-    distance > 0
-      ? `${Math.floor(seconds / 60 / distance)}:${String(Math.round((seconds / distance) % 60)).padStart(2, "0")}`
-      : "--:--";
+  const pace = distance > 0 ? `${Math.floor((seconds / distance) / 60)}:${String(Math.round((seconds / distance) % 60)).padStart(2, "0")}` : "--:--";
+  const calories = Math.round(distance * 62);
 
   const isActive = runState === "running" || runState === "paused";
 
@@ -169,6 +227,11 @@ export default function RunScreen() {
         <Text style={[styles.timerLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
           elapsed time
         </Text>
+        {errorMessage ? (
+          <Text style={[styles.errorText, { color: colors.destructive, fontFamily: "Inter_500Medium" }]}>
+            {errorMessage}
+          </Text>
+        ) : null}
       </View>
 
       {/* Metrics Row */}
@@ -199,6 +262,21 @@ export default function RunScreen() {
             </Text>
           </View>
         ))}
+      </View>
+
+      <View style={[styles.logSection, { marginHorizontal: 20, borderColor: colors.border, backgroundColor: colors.card }] }>
+        <Text style={[styles.logTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>GPS Log</Text>
+        <ScrollView contentContainerStyle={styles.logList} showsVerticalScrollIndicator={false}>
+          {logs.length === 0 ? (
+            <Text style={[styles.logText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>Start a run to see GPS tracking events.</Text>
+          ) : (
+            logs.slice(-6).map((item) => (
+              <Text key={item} style={[styles.logText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                {item}
+              </Text>
+            ))
+          )}
+        </ScrollView>
       </View>
 
       {/* Controls */}
@@ -327,6 +405,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: -4,
   },
+  errorText: {
+    fontSize: 12,
+    marginTop: 10,
+    textAlign: "center",
+  },
   metricsRow: {
     flexDirection: "row",
     gap: 10,
@@ -344,6 +427,26 @@ const styles = StyleSheet.create({
   },
   metricLabel: {
     fontSize: 11,
+  },
+  logSection: {
+    borderWidth: 1,
+    borderRadius: 14,
+    marginTop: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    minHeight: 100,
+    maxHeight: 138,
+  },
+  logTitle: {
+    fontSize: 13,
+    marginBottom: 6,
+  },
+  logList: {
+    gap: 4,
+  },
+  logText: {
+    fontSize: 11,
+    lineHeight: 16,
   },
   controls: {
     flex: 1,
