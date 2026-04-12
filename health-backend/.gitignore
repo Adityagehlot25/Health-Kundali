@@ -1,6 +1,5 @@
-
 # ============================================================================
-# FRONTEND .GITIGNORE - React Native / Expo App
+# BACKEND .GITIGNORE - Express.js / Node.js APIs
 # ============================================================================
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -25,101 +24,8 @@ node_modules/
 .secrets/
 *.key
 *.pem
-
-# ─────────────────────────────────────────────────────────────────────────
-# Expo-Specific Directories & Files
-# ─────────────────────────────────────────────────────────────────────────
-
-# Expo Cache & Build Artifacts
-.expo/
-.expo-shared/
-expo-env.d.ts
-dist/
-web-build/
-
-# ─────────────────────────────────────────────────────────────────────────
-# Android Build Artifacts & Caches
-# ─────────────────────────────────────────────────────────────────────────
-
-# Gradle Cache
-android/.gradle/
-android/gradle-wrapper.jar
-
-# Build Output
-android/app/build/
-android/build/
-android/app/.cxx/
-android/app/debug/
-android/app/release/
-
-# APK & AAB
-*.apk
-*.aab
-*.apks
-
-# Keystores & Signing Configs
-*.keystore
-*.jks
+*.pfx
 *.p12
-*.key
-android/keystores/
-
-# Local Gradle Properties
-android/local.properties
-android/gradle.properties
-
-# IDE
-android/.idea/
-android/*.iml
-android/.classpath
-android/.project
-
-# ─────────────────────────────────────────────────────────────────────────
-# iOS Build Artifacts & Caches
-# ─────────────────────────────────────────────────────────────────────────
-
-# CocoaPods
-ios/Pods/
-ios/Podfile.lock
-
-# Xcode Build
-ios/build/
-ios/Build/
-DerivedData/
-*.xcarchive
-
-# Xcode User Data
-ios/*.xcworkspace/xcuserdata/
-ios/*.xcworkspace/xcshareddata/
-xcuserdata/
-*.xccheckout
-*.xcuserstate
-
-# Xcode Files
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-*.ipa
-*.xcworkspace
-
-# Provisioning Profiles & Certificates
-*.mobileprovision
-*.mobileprovision.cer
-*.mobileprovision.p12
-*.cer
-
-# iOS Misc
-.xcode.env.local
-ios/.DS_Store
-
-# ─────────────────────────────────────────────────────────────────────────
-# Metro Bundler & React Native Caches
-# ─────────────────────────────────────────────────────────────────────────
-.metro-cache/
-.metro-cache-key
-.haste-map*
-rn-cli.config.js
 
 # ─────────────────────────────────────────────────────────────────────────
 # Package Manager Lock Files
@@ -141,11 +47,57 @@ pnpm-debug.log*
 pnpm-error.log*
 lerna-debug.log*
 
-# App Logs
+# Application Logs
 logs/
 *.log
 app.log
 error.log
+debug.log
+
+# PM2 Logs
+pm2.log
+pm2-error.log
+pm2-out.log
+pm2.json
+
+# ─────────────────────────────────────────────────────────────────────────
+# Process & Runtime Files
+# ─────────────────────────────────────────────────────────────────────────
+*.pid
+*.pid.lock
+.pid
+.lock
+
+# ─────────────────────────────────────────────────────────────────────────
+# Database & Data Files
+# ─────────────────────────────────────────────────────────────────────────
+
+# MongoDB
+.mongodb/
+data/
+db/
+*.mongodb
+*.db
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Seed Data
+seeds/
+seed-data/
+
+# ─────────────────────────────────────────────────────────────────────────
+# Build & Distribution
+# ─────────────────────────────────────────────────────────────────────────
+dist/
+build/
+.dist/
+.build/
+out/
+coverage/
+.nyc_output/
 
 # ─────────────────────────────────────────────────────────────────────────
 # IDE & Editor Configurations
@@ -157,7 +109,7 @@ error.log
 *.code-workspace
 .history/
 
-# IntelliJ IDEA / Android Studio
+# IntelliJ IDEA / WebStorm
 .idea/
 *.iml
 *.iws
@@ -206,9 +158,10 @@ $RECYCLE.BIN/
 .cache/
 .eslintcache
 .prettierignore
+.node_repl_history
 
 # ─────────────────────────────────────────────────────────────────────────
-# Test Coverage & Reports
+# Test Coverage
 # ─────────────────────────────────────────────────────────────────────────
 coverage/
 .nyc_output/
@@ -220,4 +173,3 @@ test-results/
 # ─────────────────────────────────────────────────────────────────────────
 .turbo/
 .next/
-

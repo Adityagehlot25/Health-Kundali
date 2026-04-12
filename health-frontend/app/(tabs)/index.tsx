@@ -117,7 +117,7 @@ export default function App() {
     try {
       setIsParsing(true);
       // ⚠️ Keep your actual IP address here!
-      const response = await fetch('http://10.179.117.101:3000/api/parse-log', {
+      const response = await fetch('http://192.168.236.232:3000/api/parse-log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ logText: smartLogText }),
@@ -185,7 +185,7 @@ export default function App() {
       };
 
       // ⚠️ Keep your actual IP address or localtunnel URL here!
-      const response = await fetch('http://10.179.117.101:3000/api/generate-plan', {
+      const response = await fetch('http://192.168.236.232:3000/api/generate-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fullAIContext),

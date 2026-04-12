@@ -1,11 +1,15 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { generateRealTimeAlert, generateNutritionAlert, generateSleepAlert } from '../services/alertService.js';
-import { generateRealTimeAlert, generateNutritionAlert, generateSleepAlert, generateActivityAlert } from '../services/alertService.js';
-import { generateRealTimeAlert, generateNutritionAlert, generateSleepAlert, generateActivityAlert, generateFatigueAlert } from '../services/alertService.js';
-import { generateRealTimeAlert, generateNutritionAlert, generateSleepAlert, generateActivityAlert, generateFatigueAlert, generateIntensityAlert } from '../services/alertService.js';
-import { generateRealTimeAlert, generateNutritionAlert, generateSleepAlert, generateActivityAlert, generateFatigueAlert, generateIntensityAlert, generateBloodPressureAlert } from '../services/alertService.js';
-import { generateRealTimeAlert, generateNutritionAlert, generateSleepAlert, generateActivityAlert, generateFatigueAlert, generateIntensityAlert, generateBloodPressureAlert, generateSpo2Alert } from '../services/alertService.js';
-import { generateRealTimeAlert, generateNutritionAlert, generateSleepAlert, generateActivityAlert, generateFatigueAlert, generateIntensityAlert, generateBloodPressureAlert, generateSpo2Alert, generateTemperatureAlert } from '../services/alertService.js';
+import { 
+  generateRealTimeAlert, 
+  generateNutritionAlert, 
+  generateSleepAlert, 
+  generateActivityAlert, 
+  generateFatigueAlert, 
+  generateIntensityAlert, 
+  generateBloodPressureAlert, 
+  generateSpo2Alert, 
+  generateTemperatureAlert 
+} from '../services/alertService.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

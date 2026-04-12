@@ -1,75 +1,98 @@
-# Dependency directories
-node_modules/
-.pnp
-.pnp.js
+# ============================================================================
+# ROOT .GITIGNORE - Health-Kundali Monorepo
+# ============================================================================
 
-# Expo / React Native
-.expo/
-dist/
-web-build/
-
-# Android Build Caches (We KEEP the android folder, but ignore the massive cache files inside it)
-android/.gradle/
-android/build/
-android/app/build/
-android/app/.cxx/
-*.apk
-*.aab
-*.jks
-
-# iOS
-ios/Pods/
-ios/build/
-ios/Index/
-ios/*.xcworkspace/xcuserdata
-
-# Misc
+# ─────────────────────────────────────────────────────────────────────────
+# Operating System Files
+# ─────────────────────────────────────────────────────────────────────────
 .DS_Store
-.env
-.env.local
-# Dependencies
-node_modules/
-npm-debug.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# Environment variables
-.env
-.env.local
-.env.*.local
+# ─────────────────────────────────────────────────────────────────────────
+# IDE & Editor Configurations
+# ─────────────────────────────────────────────────────────────────────────
 
-# IDE & Editor
+# VS Code
 .vscode/
+.vscode-insiders/
+*.code-workspace
+.history/
+
+# IntelliJ IDEA / WebStorm / Android Studio
 .idea/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.c9/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+
+# Visual Studio
+.vs/
+*.suo
+*.sln.iml
+
+# Vim
 *.swp
 *.swo
 *~
-.DS_Store
+.vim/
 
-# OS files
-Thumbs.db
-.DS_Store
+# Emacs
+*~
+\#*\#
+.\#*
 
-# Build/dist
+# ─────────────────────────────────────────────────────────────────────────
+# Monorepo & Build Tools
+# ─────────────────────────────────────────────────────────────────────────
 dist/
 build/
+.dist/
+.turbo/
+node_modules/
+pnpm-lock.yaml
+package-lock.json
 
-# Logs
-logs/
+# ─────────────────────────────────────────────────────────────────────────
+# Environment & Secrets
+# ─────────────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+.secrets/
+*.pem
+*.key
+
+# ─────────────────────────────────────────────────────────────────────────
+# Logs & Temporary Files
+# ─────────────────────────────────────────────────────────────────────────
 *.log
-
-# Temporary files
 *.tmp
-.temp/
+*.temp
+.tmp/
+logs/
+.cache/
 
-# Package lock (optional - uncomment if you want to commit it)
-# package-lock.json
-
-# Test coverage
+# ─────────────────────────────────────────────────────────────────────────
+# Test Coverage
+# ─────────────────────────────────────────────────────────────────────────
 coverage/
 .nyc_output/
-
-# Misc
-.cache/
