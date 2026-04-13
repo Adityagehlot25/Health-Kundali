@@ -1,24 +1,61 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as SecureStore from 'expo-secure-store';
+import { useHealthStore } from '../store/healthStore';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const { isAuthenticated, loginSession } = useHealthStore();
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  
+  const segments = useSegments();
+  const router = useRouter();
+  const navigationState = useRootNavigationState();
+
+  // 1. BOOT CHECK: Look for the token in the phone's hardware
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('userToken');
+        if (token) {
+          // We found a token! Silently log them in.
+          // (Passing a dummy user object just to satisfy the store for now)
+          loginSession(token, { id: "saved_user", name: "Kundali User", email: "" });
+        }
+      } catch (error) {
+        console.error("Failed to fetch token on boot", error);
+      } finally {
+        setIsAuthChecked(true); // We finished checking!
+      }
+    };
+    checkToken();
+  }, []);
+
+  // 2. THE GATEKEEPER
+  useEffect(() => {
+    // Wait until Expo Router is ready AND we've finished checking the token
+    if (!navigationState?.key || !isAuthChecked) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    setTimeout(() => {
+      if (!isAuthenticated && !inAuthGroup) {
+        router.replace('/(auth)/welcome');
+      } else if (isAuthenticated && inAuthGroup) {
+        router.replace('/(tabs)');
+      }
+    }, 10);
+  }, [isAuthenticated, segments, navigationState?.key, isAuthChecked]);
+
+  // While checking SecureStore, render nothing so we don't flash the wrong screen
+  if (!isAuthChecked) return null; 
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+    <SafeAreaProvider>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

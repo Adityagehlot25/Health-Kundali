@@ -32,6 +32,83 @@ healthSchema.index({ userId: 1, date: 1 }, { unique: true });
 
 const HealthData = mongoose.model('HealthData', healthSchema);
 
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+// --- USER SCHEMA FOR AUTHENTICATION ---
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+const User = mongoose.model('User', userSchema);
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
+
+// 🔐 AUTH ROUTE: REGISTER
+app.post('/api/register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, error: "Email already in use." });
+    }
+
+    // Hash the password securely
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Save to database
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save();
+
+    // Issue a JWT token
+    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '30d' });
+
+    res.json({ 
+      success: true, 
+      token, 
+      user: { id: newUser._id, name: newUser.name, email: newUser.email } 
+    });
+  } catch (error) {
+    console.error("Registration Error:", error);
+    res.status(500).json({ success: false, error: "Server error during registration." });
+  }
+});
+
+// 🔐 AUTH ROUTE: LOGIN
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find the user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ success: false, error: "Invalid email or password." });
+    }
+
+    // Compare the hashed passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, error: "Invalid email or password." });
+    }
+
+    // Issue a JWT token
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '30d' });
+
+    res.json({ 
+      success: true, 
+      token, 
+      user: { id: user._id, name: user.name, email: user.email } 
+    });
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ success: false, error: "Server error during login." });
+  }
+});
+
 // 3. Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
