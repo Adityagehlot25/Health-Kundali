@@ -40,31 +40,36 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  // 🧬 NEW ONBOARDING FIELDS
+  gender: { type: String, default: "Not Specified" },
+  dob: { type: String, default: "" },
+  height: { type: String, default: "" },
+  weight: { type: String, default: "" },
+  goal: { type: String, default: "Maintain" },
+  activityLevel: { type: String, default: "Moderate" },
+  diet: { type: String, default: "Any" },
+  medicalInfo: { type: String, default: "None" },
+  
   createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
-// 🔐 AUTH ROUTE: REGISTER
+// 🔐 AUTH ROUTE 1: CREATE ACCOUNT (Basic Info)
 app.post('/api/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ success: false, error: "Email already in use." });
     }
 
-    // Hash the password securely
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Save to database
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
-    // Issue a JWT token
     const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '30d' });
 
     res.json({ 
@@ -75,6 +80,37 @@ app.post('/api/register', async (req, res) => {
   } catch (error) {
     console.error("Registration Error:", error);
     res.status(500).json({ success: false, error: "Server error during registration." });
+  }
+});
+
+// 🧬 AUTH ROUTE 2: SAVE BIOMETRICS (Onboarding)
+app.post('/api/onboarding', async (req, res) => {
+  try {
+    const { userId, gender, dob, height, weight, goal, activityLevel, diet, medicalInfo } = req.body;
+
+    // Find the user we just created and update their profile
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, 
+      { gender, dob, height, weight, goal, activityLevel, diet, medicalInfo },
+      { new: true } // Returns the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, error: "User not found." });
+    }
+
+    res.json({ 
+      success: true, 
+      user: { 
+        id: updatedUser._id, name: updatedUser.name, email: updatedUser.email,
+        gender: updatedUser.gender, dob: updatedUser.dob, height: updatedUser.height, 
+        weight: updatedUser.weight, goal: updatedUser.goal, activityLevel: updatedUser.activityLevel, 
+        diet: updatedUser.diet, medicalInfo: updatedUser.medicalInfo
+      } 
+    });
+  } catch (error) {
+    console.error("Onboarding Error:", error);
+    res.status(500).json({ success: false, error: "Server error during onboarding." });
   }
 });
 
@@ -98,10 +134,16 @@ app.post('/api/login', async (req, res) => {
     // Issue a JWT token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '30d' });
 
+    // REPLACE your res.json with this massive one:
     res.json({ 
       success: true, 
       token, 
-      user: { id: user._id, name: user.name, email: user.email } 
+      user: { 
+        id: user._id, name: user.name, email: user.email,
+        gender: user.gender, dob: user.dob, height: user.height, 
+        weight: user.weight, goal: user.goal, activityLevel: user.activityLevel, 
+        diet: user.diet, medicalInfo: user.medicalInfo
+      } 
     });
   } catch (error) {
     console.error("Login Error:", error);
@@ -244,49 +286,54 @@ app.post('/api/generate-plan', async (req, res) => {
 // 🧠 PIPELINE 2: UNIVERSAL SMART LOGGER
 app.post('/api/parse-log', async (req, res) => {
   try {
-    const { logText } = req.body;
+    // Catch the text AND the user's biological profile from the app
+    const { logText, userData } = req.body;
 
-    // 1. Initialize the model WITH strict JSON mode enabled
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
-      generationConfig: { responseMimeType: "application/json" } // Force valid JSON output
+      generationConfig: { responseMimeType: "application/json" } 
     });
 
-    // Inside your /api/parse-log route...
+    // We inject the biological data directly into the system instructions!
     const prompt = `
-  You are an expert health data extractor. The user is logging a SINGLE event during their day.
-  
-  Tasks:
-  1. Analyze the text and approximate nutrition (calories, protein, carbs, fiber) based on portion sizes.
-  2. If a category is NOT mentioned, return 0 or empty values.
+      You are an expert health data extractor. The user is logging a SINGLE event during their day.
+      
+      USER BIOLOGICAL PROFILE:
+      - Gender: ${userData?.gender || 'Unknown'}
+      - Weight: ${userData?.weight || 'Unknown'} kg
+      - Height: ${userData?.height || 'Unknown'} cm
+      - Diet: ${userData?.diet || 'Any'}
+      - Goal: ${userData?.goal || 'Maintain'}
 
-  Expected Strict JSON Format:
-  {
-    "nutrition": { 
-      "waterLiters": 0, 
-      "calories": 0, 
-      "proteinGrams": 0,
-      "carbsGrams": 0,
-      "fiberGrams": 0,
-      "foodItems": [] 
-    },
-    "gym": { 
-      "completedWorkout": false, 
-      "split": "None", 
-      "workoutLogs": [] 
-    },
-    "cycle": { "isMenstruating": false, "symptoms": "None" },
-    "injuries": { "active": false, "location": "None", "notes": "None" }
-  }
+      Tasks:
+      1. Analyze the text and approximate nutrition (calories, protein, carbs, fiber) based on the food mentioned.
+      2. USE THEIR PROFILE: If they are on a "Bulk" and weigh 90kg, estimate larger portion sizes. If they are "Vegetarian", ensure protein estimations make sense for plant-based sources.
+      3. If a category is NOT mentioned in the text, return 0 or empty values. Do not invent logs.
 
-  User Log: "${logText}"
-`;
+      Expected Strict JSON Format:
+      {
+        "nutrition": { 
+          "waterLiters": 0, 
+          "calories": 0, 
+          "proteinGrams": 0,
+          "carbsGrams": 0,
+          "fiberGrams": 0,
+          "foodItems": [] 
+        },
+        "gym": { 
+          "completedWorkout": false, 
+          "split": "None", 
+          "workoutLogs": [] 
+        },
+        "cycle": { "isMenstruating": false, "symptoms": "None" },
+        "injuries": { "active": false, "location": "None", "notes": "None" }
+      }
 
-    // 3. Call Gemini
+      User Log: "${logText}"
+    `;
+
     const result = await model.generateContent(prompt);
     const rawText = result.response.text();
-
-    // Because we used responseMimeType, we can safely parse immediately
     const parsedData = JSON.parse(rawText);
 
     res.json({ success: true, data: parsedData });
@@ -294,6 +341,49 @@ app.post('/api/parse-log', async (req, res) => {
   } catch (error) {
     console.error("Smart Parse Error:", error);
     res.status(500).json({ success: false, error: "Failed to parse log." });
+  }
+});
+
+/// 💾 SAVE ROUTE: Persist Journal Data to MongoDB
+app.post('/api/save-journal', async (req, res) => {
+  try {
+    console.log("📥 [SAVE] Receiving journal data for User:", req.body.userId);
+
+    const { userId, manualInputs } = req.body;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
+
+    // Explicitly using $set makes Mongoose happy!
+    const result = await HealthData.findOneAndUpdate(
+      { userId: userId, date: today },
+      { $set: { manualInputs: manualInputs, lastUpdated: Date.now() } },
+      { upsert: true, returnDocument: 'after' }
+    );
+
+    console.log("✅ [SAVE] Successfully saved to HealthData collection!");
+    res.json({ success: true, doc: result });
+  } catch (error) {
+    console.error("❌ [SAVE ERROR]:", error);
+    res.status(500).json({ success: false, error: "Failed to save journal" });
+  }
+});
+
+// 🔄 LOAD ROUTE: Get Today's Data on App Boot
+app.get('/api/today/:userId', async (req, res) => {
+  try {
+    console.log("📥 [LOAD] Fetching today's data for User:", req.params.userId);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const dailyRecord = await HealthData.findOne({ userId: req.params.userId, date: today });
+    
+    console.log("✅ [LOAD] Found record in DB:", dailyRecord ? "YES" : "NO");
+    res.json({ success: true, data: dailyRecord || {} });
+  } catch (error) {
+    console.error("❌ [LOAD ERROR]:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch today's data" });
   }
 });
 

@@ -33,6 +33,7 @@ export default function LoginScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         // Save token securely to the phone's hardware
         await SecureStore.setItemAsync('userToken', data.token);
+        await SecureStore.setItemAsync('userData', JSON.stringify(data.user));
         // Update the Global Brain!
         loginSession(data.token, data.user);
       } else {

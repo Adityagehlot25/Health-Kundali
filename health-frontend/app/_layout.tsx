@@ -17,15 +17,17 @@ export default function RootLayout() {
     const checkToken = async () => {
       try {
         const token = await SecureStore.getItemAsync('userToken');
-        if (token) {
-          // We found a token! Silently log them in.
-          // (Passing a dummy user object just to satisfy the store for now)
-          loginSession(token, { id: "saved_user", name: "Kundali User", email: "" });
+        const userDataString = await SecureStore.getItemAsync('userData');
+        
+        if (token && userDataString) {
+          // We found everything! Parse the string back into a JSON object
+          const parsedUser = JSON.parse(userDataString);
+          loginSession(token, parsedUser);
         }
       } catch (error) {
         console.error("Failed to fetch token on boot", error);
       } finally {
-        setIsAuthChecked(true); // We finished checking!
+        setIsAuthChecked(true); 
       }
     };
     checkToken();

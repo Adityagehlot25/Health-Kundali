@@ -4,20 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { useHealthStore } from '../../store/healthStore';
-import * as SecureStore from 'expo-secure-store';
 
 export default function RegisterScreen() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  const { loginSession } = useHealthStore();
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
+      Alert.alert("Missing Info", "Please fill in all fields.");
       return;
     }
 
@@ -32,10 +28,13 @@ export default function RegisterScreen() {
 
       if (data.success) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        // Save token securely to the phone's hardware
-        await SecureStore.setItemAsync('userToken', data.token);
-        // Update the Global Brain!
-        loginSession(data.token, data.user);
+        
+        // 🚀 MAGIC STEP: Send them to onboarding WITH their new ID and Token!
+        router.push({
+          pathname: '/(auth)/onboarding',
+          params: { userId: data.user.id, token: data.token }
+        });
+
       } else {
         Alert.alert("Registration Failed", data.error);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -45,7 +44,6 @@ export default function RegisterScreen() {
       Alert.alert("Network Error", "Could not connect to the server.");
     }
   };
-
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -58,46 +56,18 @@ export default function RegisterScreen() {
 
           <View style={styles.header}>
             <Ionicons name="planet" size={60} color="#3B82F6" />
-            <Text style={styles.title}>Join Kundali</Text>
-            <Text style={styles.subtitle}>Create your 9-Planet biological profile.</Text>
+            <Text style={styles.title}>Secure Account</Text>
+            <Text style={styles.subtitle}>Step 1: Set up your credentials.</Text>
           </View>
 
           <View style={styles.form}>
-            <TextInput 
-              style={styles.input} 
-              placeholder="Full Name" 
-              placeholderTextColor="#64748B"
-              autoCapitalize="words"
-              value={name}
-              onChangeText={setName}
-            />
-            <TextInput 
-              style={styles.input} 
-              placeholder="Email Address" 
-              placeholderTextColor="#64748B"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={email}
-              onChangeText={setEmail}
-            />
-            <TextInput 
-              style={styles.input} 
-              placeholder="Password" 
-              placeholderTextColor="#64748B"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
+            <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor="#64748B" autoCapitalize="words" value={name} onChangeText={setName} />
+            <TextInput style={styles.input} placeholder="Email Address" placeholderTextColor="#64748B" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
+            <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#64748B" secureTextEntry value={password} onChangeText={setPassword} />
             
             <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-              <Text style={styles.registerButtonText}>Create Account</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => router.replace('/(auth)/login')}>
-              <Text style={styles.footerLink}>Sign In</Text>
+              <Text style={styles.registerButtonText}>Continue to Biometrics</Text>
+              <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={{ marginLeft: 8 }} />
             </TouchableOpacity>
           </View>
 
@@ -116,9 +86,6 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 16, color: '#94A3B8', marginTop: 8 },
   form: { width: '100%' },
   input: { backgroundColor: '#1E293B', color: '#FFFFFF', padding: 18, borderRadius: 12, fontSize: 16, marginBottom: 16, borderWidth: 1, borderColor: '#334155' },
-  registerButton: { backgroundColor: '#3B82F6', paddingVertical: 18, borderRadius: 12, alignItems: 'center', marginTop: 8 },
-  registerButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },
-  footerText: { color: '#94A3B8', fontSize: 16 },
-  footerLink: { color: '#3B82F6', fontSize: 16, fontWeight: 'bold' }
+  registerButton: { backgroundColor: '#3B82F6', paddingVertical: 18, borderRadius: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 8 },
+  registerButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' }
 });

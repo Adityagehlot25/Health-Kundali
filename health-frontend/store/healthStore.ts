@@ -23,10 +23,21 @@ interface HealthState {
   };
   setGoals: (newGoals: any) => void;
 
+  // 🤖 AI PLAN STATE
+  currentPlan: string | null;
+  setPlan: (plan: string) => void;
+
+  // 🔄 LOAD DATA FROM DB
+  loadDailyData: (manualData: any, plan: string) => void;
+
   // --- AUTHENTICATION ---
   isAuthenticated: boolean;
   userToken: string | null;
-  userData: { id: string; name: string; email: string; } | null;
+  userData: { 
+    id: string; name: string; email: string; 
+    gender?: string; dob?: string; height?: string; weight?: string;
+    goal?: string; activityLevel?: string; diet?: string; medicalInfo?: string;
+  } | null;
   loginSession: (token: string, user: any) => void;
   logoutSession: () => void;
 }
@@ -51,6 +62,16 @@ export const useHealthStore = create<HealthState>((set) => ({
     calories: "2500"
   },
   setGoals: (newGoals) => set((state) => ({ goals: { ...state.goals, ...newGoals } })),
+
+  // 🤖 AI PLAN STATE
+  currentPlan: null,
+  setPlan: (plan) => set({ currentPlan: plan }),
+
+  // 🔄 LOAD DATA FROM DB
+  loadDailyData: (dbManualData, dbPlan) => set((state) => ({ 
+    manualData: dbManualData || state.manualData,
+    currentPlan: dbPlan || null 
+  })),
 
   // --- AUTHENTICATION ---
   isAuthenticated: false,
